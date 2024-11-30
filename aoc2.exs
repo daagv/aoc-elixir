@@ -14,27 +14,44 @@ defmodule Aoc.Day02 do
   @configuration %{"red" => 12, "green" => 13, "blue" => 14}
 
   def part1(input) do
-    input
-    |>process_input()
+    String.split(input, "\n", trim: true)
+    |> process_input()
+    |> process_map()
 
   end
 
+  # returns : %{1 => [" 3 blue", " 4 red", " 1 red", " 2 green", " 6 blue", " 2 green"]}
   @spec process_input(String.t()) :: map()
   defp process_input(input) do
     [head|tail] = String.split(input, ":", trim: true)
     values = List.to_string(tail) |> String.split(";", trim: true)
-    map_content = [head] ++ [values]
+    processed_values = Enum.map(values, fn item ->
+      String.split(item, ",", trim: true) end)
+      |> List.flatten()
+    game_number = String.split(head, " ", trim: true) |> List.last() |> String.to_integer()
+    map_content = [game_number] ++ [processed_values]
     chunked_list = Enum.chunk_every(map_content,2)
-    final_map = Map.new(chunked_list, fn [k, v] -> {k, v} end)
+    Map.new(chunked_list, fn [k, v] -> {k, v} end)
   end
 
-  # %{"Game 3" => [" 8 green, 6 blue, 20 red", " 5 blue, 4 red, 13 green", " 5 green, 1 red"]}
-  # returns : [" 8 green", " 6 blue", " 20 red", " 5 blue", " 4 red", " 13 green", " 5 green", " 1 red"]
   defp process_map(map) do
-    keys = Map.keys(map)
-    # returns : [" 8 green", " 6 blue", " 20 red", " 5 blue", " 4 red", " 13 green", " 5 green", " 1 red"]
-    results_per_game = Enum.map(map, fn {_game, list} -> Enum.map(list, fn item -> String.split(item, ",", trim: true) end) end) |> List.flatten()
-
+    results_per_game = Enum.map(map, fn {game, list} ->
+    Enum.map(list, fn result ->
+      [number|color] = String.split(result, " ", trim: true)
+      [{String.to_integer(number),color}]
+    end)
+    |> List.flatten()
+  end)
   end
 
+end
+
+file_path = "./inputday02.txt"
+
+case File.read(file_path) do
+  {:ok, content} ->
+    result = Aoc.Day02.part1(content)
+    IO.puts(result)
+
+    {:error, reason} -> IO.puts("Failed to read de file: #{reason}")
 end
