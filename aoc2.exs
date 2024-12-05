@@ -14,10 +14,9 @@ defmodule Aoc.Day02 do
   @configuration %{"red" => 12, "green" => 13, "blue" => 14}
 
   def part1(input) do
-    String.split(input, "\n", trim: true)
-    |> process_input()
-    |> process_map()
-
+    content = String.split(input, "\n", trim: true)
+    Enum.map(content, fn line -> process_input(line)end)
+    |> Enum.map(fn prev_result -> process_map(prev_result)end)
   end
 
   # returns : %{1 => [" 3 blue", " 4 red", " 1 red", " 2 green", " 6 blue", " 2 green"]}
@@ -44,14 +43,20 @@ defmodule Aoc.Day02 do
   end)
   end
 
+  # tried it, had to look for the solution as i am not familiarized with the syntax
+  # just started learning
 end
+
+
+
+
 
 file_path = "./inputday02.txt"
 
 case File.read(file_path) do
   {:ok, content} ->
     result = Aoc.Day02.part1(content)
-    IO.puts(result)
+    IO.inspect(result)
 
     {:error, reason} -> IO.puts("Failed to read de file: #{reason}")
 end
